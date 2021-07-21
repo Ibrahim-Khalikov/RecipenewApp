@@ -38,6 +38,10 @@ class DataService {
                 // Add the unique IDs
                 for r in recipeData {
                     r.id = UUID()
+                    
+                    for i in r.ingredients{
+                        i.id = UUID()
+                    }
                 }
                 
                 // Return the recipes
@@ -56,4 +60,60 @@ class DataService {
         return [Recipe]()
     }
     
+    static func getPortion(ingredients:Ingredient, recipeServing: Int, targerServing: Int) -> String {
+        
+        var portion = ""
+        var numerator = ingredients.num ?? 1
+        var denominator = ingredients.denom ?? 1
+        var wholeportion = 0
+        
+        if numerator != nil {
+            
+            denominator *= recipeServing
+            numerator *= targerServing
+            
+            
+            let divisor = Rational.greatestCommonDivisor(numerator, denominator)
+            
+            numerator /= divisor
+            denominator /= divisor
+            
+            if numerator >= denominator {
+                
+                wholeportion = numerator / denominator
+                numerator = numerator % denominator
+                portion += String(wholeportion)
+             }
+            
+            if numerator > 0 {
+                
+                portion += wholeportion > 0 ? " " : ""
+                portion += "\(numerator)/\(denominator)"
+                
+                
+            }
+        }
+        
+        if var unit = ingredients.unit {
+            
+            if wholeportion > 1 {
+                if unit.suffix(2) == "ch" {
+                    unit += "es"
+                }
+                else if unit.suffix(1) == "f" {
+                    unit = String(unit.dropLast())
+                    unit += "ves"
+                }
+                else{
+                    unit += "s"
+                }
+            }
+            
+            portion += ingredients.num == nil && ingredients.denom == nil ? "" : " "
+                
+                return portion + unit
+        }
+        
+        return portion
+    }
 }

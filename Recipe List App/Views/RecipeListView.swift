@@ -10,12 +10,15 @@ import SwiftUI
 struct RecipeListView: View {
     
     // Reference the view model
-    @ObservedObject var model = RecipeModel()
+    @EnvironmentObject var model: RecipeModel
     
     var body: some View {
         
         NavigationView {
-            List(model.recipes) { r in
+            ScrollView{
+                LazyVStack(alignment: .leading){
+                
+                ForEach(model.recipes) { r in
                 
                 NavigationLink(
                     destination: RecipeDetailView(recipe:r),
@@ -28,20 +31,31 @@ struct RecipeListView: View {
                                 .scaledToFill()
                                 .frame(width: 50, height: 50, alignment: .center)
                                 .clipped()
-                                .cornerRadius(5)
+                                .clipShape(Circle())
+                            //.cornerRadius(5)
+                         
+                            VStack(alignment: .leading){
+                            
                             Text(r.name)
+                                .font(Font.custom("Avenir Heavy", size: 16))
+                                highlights(highlights: r.highlights)
+                                    .font(Font.custom("Avenir", size: 13))
+                                    .foregroundColor(.gray)
+                            }
                         }
-                        
                     })
                 
                 
                 
             }
-            .navigationBarTitle("All Recipes")
+                }.foregroundColor(.black)
+                .padding()
+                
+        }.navigationBarTitle("All Recipes")
+            
         }
-    }
 }
-
+}
 struct RecipeListView_Previews: PreviewProvider {
     static var previews: some View {
         RecipeListView()
